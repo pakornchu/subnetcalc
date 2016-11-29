@@ -1,0 +1,122 @@
+{% extends "templates/base.html" %}
+{% block script %}
+<script>
+	$(document).keypress(function(e) {
+	    if(e.which == 13) {
+		submitV4();
+	    }
+	});
+
+	function clearform() {
+		$('#output').empty();
+		$('#ipaddr').val('');
+		$('#ipaddr').focus();
+		$('#netmask').val('255.255.255.0');
+	}
+
+	function submitV4() {
+		$('#output').empty();
+		var ipaddr = $('#ipaddr').val();
+		var csrf = $('input[name=csrfmiddlewaretoken]').val();
+		if ( ipaddr == '' ) {
+			$('#output').html('<div class="alert alert-warning">Please enter IP or CIDR address</div>');
+		} else {
+			$.post('/ipv4check/', {csrfmiddlewaretoken: csrf, i: ipaddr}, addrCheckHandler);
+		};
+	};
+
+	function addrCheckHandler(data) {
+		var output = eval('(' + data + ')');
+		var ipaddr = $('#ipaddr').val();
+		var csrf = $('input[name=csrfmiddlewaretoken]').val();
+		if ( output.result == true ) {
+			if (output.addrtype == 'cidr4') {
+				$.post('/ipv4/', {csrfmiddlewaretoken: csrf, i: ipaddr, itype: output.addrtype}, addrResultHandler);
+			} else if ( output.addrtype == 'ipv4' ) {
+				var subnet = $('#netmask').val();
+				$.post('/ipv4/', {csrfmiddlewaretoken: csrf, i: ipaddr, itype: output.addrtype, netmask: subnet}, addrResultHandler);
+			};
+		} else {
+			$('#output').html('<div class="alert alert-warning">Cannot determine address type, check your address</div>');
+		}
+	};
+
+	function addrResultHandler(data) {
+		var result = eval('(' + data + ')');
+		if ( result.result == true ) {
+			var pageoutput = '<div class="panel panel-success"><div class="panel-heading"><strong>Subnet Information</stron    g></div><table class="table"><tr><td width="30%"><strong>IP Version</strong></td><td>IPv' + result.output.version + '</td></tr>';
+			pageoutput += '<tr><td><strong>CIDR Address</strong></td><td>' + result.output.cidr + '</td></tr>';
+			pageoutput += '<tr><td><strong>Subnet Bits</strong></td><td>' + result.output.netbits + '</td></tr>';
+			pageoutput += '<tr><td><strong>Subnet Mask</strong></td><td>' + result.output.netmask + '</td></tr>';
+			pageoutput += '<tr><td><strong>Host Mask</strong></td><td>' + result.output.hostmask + '</td></tr>';
+			pageoutput += '<tr><td><strong>Network Address</strong></td><td>' + result.output.network_address + '</td></tr>';
+			pageoutput += '<tr><td><strong>Broadcast Address</strong></td><td>' + result.output.broadcast_address + '</td></tr>';
+			pageoutput += '<tr><td><strong>Total Hosts</strong></td><td>' + result.output.total + '</td></tr>';
+			pageoutput += '<tr><td><strong>Usable Hosts</strong></td><td>' + result.output.usable + '</td></tr>';
+			pageoutput += '<tr><td><strong>Usable Addresses</strong></td><td>' + result.output.firsthost + '-' + result.output.lasthost + '</td></tr>';
+			
+			$('#output').html(pageoutput);
+
+		} else {
+			$('#output').html('<div class="alert alert-danger">Calculation error. Sorry!</div>');
+		};
+	}
+	</script>
+
+{% endblock %}
+{% block main %}
+
+<div class="page-header">
+	<h3>IPv4 Subnet Calculator</h3>
+	</div>
+	<p>
+	{% csrf_token %}
+	<div class="form-group">
+	<label class="control-label">IP Address </label>
+	<input type="text" name="i" id="ipaddr" class="form-control" placeholder="IP/CIDR address i.e. 192.168.0.1 or 172.16.0.0/16" required autofocus>
+	<span style="color:salmon;">&nbsp;*Network prefix entered here will override subnet mask below.</span>
+	</div>
+	<input type="hidden" name="itype" value="cidr4">
+	<div class="form-group">
+	<label class="control-label" id="subnet">Subnet mask</label>
+	<select name="netmask" class="form-control" id="netmask">
+	<option>128.0.0.0</option>
+	<option>192.0.0.0</option>
+	<option>224.0.0.0</option>
+	<option>240.0.0.0</option>
+	<option>248.0.0.0</option>
+	<option>252.0.0.0</option>
+	<option>254.0.0.0</option>
+	<option>255.0.0.0</option>
+	<option>255.128.0.0</option>
+	<option>255.192.0.0</option>
+	<option>255.224.0.0</option>
+	<option>255.240.0.0</option>
+	<option>255.248.0.0</option>
+	<option>255.252.0.0</option>
+	<option>255.254.0.0</option>
+	<option>255.255.0.0</option>
+	<option>255.255.128.0</option>
+	<option>255.255.192.0</option>
+	<option>255.255.224.0</option>
+	<option>255.255.240.0</option>
+	<option>255.255.248.0</option>
+	<option>255.255.252.0</option>
+	<option>255.255.254.0</option>
+	<option selected>255.255.255.0</option>
+	<option>255.255.255.128</option>
+	<option>255.255.255.192</option>
+	<option>255.255.255.224</option>
+	<option>255.255.255.240</option>
+	<option>255.255.255.248</option>
+	<option>255.255.255.252</option>
+	<option>255.255.255.254</option>
+	<option>255.255.255.255</option>
+	</select>
+	</div>
+
+	<button type="button" class="btn btn-primary" onClick="submitV4();">Calculate</button> <button type="button" class="btn btn-default" onClick="clearform();">Clear</button>
+	</p>
+	<div id="output">
+	</div>
+{% endblock %}
