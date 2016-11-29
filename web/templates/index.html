@@ -15,6 +15,7 @@
 	}
 
 	function submitV4() {
+		$('#note').empty();
 		$('#output').empty();
 		var ipaddr = $('#ipaddr').val();
 		var csrf = $('input[name=csrfmiddlewaretoken]').val();
@@ -68,55 +69,67 @@
 
 <div class="page-header">
 	<h3>IPv4 Subnet Calculator</h3>
-	</div>
-	<p>
+</div>
 	{% csrf_token %}
-	<div class="form-group">
-	<label class="control-label">IP Address </label>
-	<input type="text" name="i" id="ipaddr" class="form-control" placeholder="IP/CIDR address i.e. 192.168.0.1 or 172.16.0.0/16" required autofocus>
-	<span style="color:salmon;">&nbsp;*Network prefix entered here will override subnet mask below.</span>
-	</div>
-	<input type="hidden" name="itype" value="cidr4">
-	<div class="form-group">
-	<label class="control-label" id="subnet">Subnet mask</label>
-	<select name="netmask" class="form-control" id="netmask">
-	<option>128.0.0.0</option>
-	<option>192.0.0.0</option>
-	<option>224.0.0.0</option>
-	<option>240.0.0.0</option>
-	<option>248.0.0.0</option>
-	<option>252.0.0.0</option>
-	<option>254.0.0.0</option>
-	<option>255.0.0.0</option>
-	<option>255.128.0.0</option>
-	<option>255.192.0.0</option>
-	<option>255.224.0.0</option>
-	<option>255.240.0.0</option>
-	<option>255.248.0.0</option>
-	<option>255.252.0.0</option>
-	<option>255.254.0.0</option>
-	<option>255.255.0.0</option>
-	<option>255.255.128.0</option>
-	<option>255.255.192.0</option>
-	<option>255.255.224.0</option>
-	<option>255.255.240.0</option>
-	<option>255.255.248.0</option>
-	<option>255.255.252.0</option>
-	<option>255.255.254.0</option>
-	<option selected>255.255.255.0</option>
-	<option>255.255.255.128</option>
-	<option>255.255.255.192</option>
-	<option>255.255.255.224</option>
-	<option>255.255.255.240</option>
-	<option>255.255.255.248</option>
-	<option>255.255.255.252</option>
-	<option>255.255.255.254</option>
-	<option>255.255.255.255</option>
-	</select>
-	</div>
+<div class="container-fluid">
+	<div class="col-sm-6">
+		<div class="form-group">
+			<label class="control-label">IP Address </label>
+			<input type="text" name="i" id="ipaddr" class="form-control" placeholder="IP/CIDR address i.e. 192.168.0.1 or 172.16.0.0/16" required autofocus>
+			<span style="color:salmon;">&nbsp;*Network prefix entered here will override subnet mask below.</span>
+		</div>
+
+		<div class="form-group">
+		<label class="control-label" id="subnet">Subnet mask</label>
+		<select name="netmask" class="form-control" id="netmask">
+		<option>128.0.0.0</option>
+		<option>192.0.0.0</option>
+		<option>224.0.0.0</option>
+		<option>240.0.0.0</option>
+		<option>248.0.0.0</option>
+		<option>252.0.0.0</option>
+		<option>254.0.0.0</option>
+		<option>255.0.0.0</option>
+		<option>255.128.0.0</option>
+		<option>255.192.0.0</option>
+		<option>255.224.0.0</option>
+		<option>255.240.0.0</option>
+		<option>255.248.0.0</option>
+		<option>255.252.0.0</option>
+		<option>255.254.0.0</option>
+		<option>255.255.0.0</option>
+		<option>255.255.128.0</option>
+		<option>255.255.192.0</option>
+		<option>255.255.224.0</option>
+		<option>255.255.240.0</option>
+		<option>255.255.248.0</option>
+		<option>255.255.252.0</option>
+		<option>255.255.254.0</option>
+		<option selected>255.255.255.0</option>
+		<option>255.255.255.128</option>
+		<option>255.255.255.192</option>
+		<option>255.255.255.224</option>
+		<option>255.255.255.240</option>
+		<option>255.255.255.248</option>
+		<option>255.255.255.252</option>
+		<option>255.255.255.254</option>
+		<option>255.255.255.255</option>
+		</select>
+		</div>
 
 	<button type="button" class="btn btn-primary" onClick="submitV4();">Calculate</button> <button type="button" class="btn btn-default" onClick="clearform();">Clear</button>
-	</p>
+
+	</div>
+	<div class="col-sm-6" id="note">
+		<p>
+		Classless Inter-Domain Routing (CIDR) is a method for allocating IP addresses and routing Internet Protocol packets. The Internet Engineering Task Force introduced CIDR in 1993 to replace the previous addressing architecture of classful network design in the Internet. Its goal was to slow the growth of routing tables on routers across the Internet, and to help slow the rapid exhaustion of IPv4 addresses.
+		</p><p>
+		CIDR encompasses several concepts. It is based on the variable-length subnet masking (VLSM) technique with effective qualities of specifying arbitrary-length prefixes. CIDR introduced a new method of representation for IP addresses, now commonly known as CIDR notation, in which an address or routing prefix is written with a suffix indicating the number of bits of the prefix, such as 192.168.2.0/24 for IPv4, and 2001:db8::/32 for IPv6. CIDR introduced an administrative process of allocating address blocks to organizations based on their actual and short-term projected needs. The aggregation of multiple contiguous prefixes resulted in supernets in the larger Internet, which whenever possible are advertised as aggregates, thus reducing the number of entries in the global routing table.
+		</p>
+		<span style="font-size:0.8em;">Retrieved from "<a href="https://en.wikipedia.org/w/index.php?title=Classless_Inter-Domain_Routing&oldid=751720659">https://en.wikipedia.org/w/index.php?title=Classless_Inter-Domain_Routing&oldid=751720659</a>" </span>
+	</div>
+</div>
+<br /><br />
 	<div id="output">
 	</div>
 {% endblock %}
